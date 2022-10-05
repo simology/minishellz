@@ -18,7 +18,7 @@ char **split_command_line(char *line)
   char **splited;
 
   position = 0;
-  splited = ft_split(line, ' ');
+  splited = ft_split(line, (char)SPACE_DELM);
   while (splited[position] != '\0'){
     //printf("VAL : %s \n", splited[position]);
     position++;
@@ -47,7 +47,7 @@ void shell_loop(void)
     line = read_line();
     args = split_command_line(line);
     //status = lsh_execute(args);
-    //printf("val : %s \n", args[1]);
+    printf("val : %s \n", args[1]);
 
     free(line);
     //free(args);
