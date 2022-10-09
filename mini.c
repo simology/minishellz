@@ -72,6 +72,7 @@ int cmd_execute(char **args)
     // Error forking
     perror("lsh fork");
   } 
+  
   else {
     // Parent process
     while(!WIFEXITED(status) && !WIFSIGNALED(status))
@@ -79,7 +80,7 @@ int cmd_execute(char **args)
       wpid = waitpid(pid, &status, WUNTRACED);
     }
   }
-
+  
   return 1;
 }
 
@@ -87,33 +88,37 @@ int cmd_prepare(char **args)
 {
   int i;
   char **cmd;
+
   i = 0;
   cmd = builtin_str();
 
   /*
-  char *builtin_str[] = {
+  char *cmd[] = {
   "cd",
-  "exit"
+  "exit",
+  "help"
   };
-  */
 
   int (*builtin_func[]) (char **) = {
   &cmd_cd,
   &cmd_exit
   };
-
+  */
   if (args[0] == NULL) {
     // An empty command was entered.
     return 1;
   }
-  printf("val : %s \n", args[0]);
+  //while(i < lsh_num_builtins(cmd)){
   while(i < len_num_builtins(cmd)){
-      if (strcmp(args[0], cmd[i]) == 0) {
-        //printf("builtin cmd %s and invoke %s \n", args[0], cmd[i]);
-      return (*builtin_func[i])(args);
+      if (ft_strcmp(args[0], cmd[i]) == 0) {
+        return (builtin_func(cmd[i], args));
+        //return (*builtin_func[i])(args);
+      
     }
     i++;
   }
+        printf("count : %d \n", len_num_builtins(cmd));
+        printf("cmd : %s \n", cmd[i]);
 
   return cmd_execute(args);
 }

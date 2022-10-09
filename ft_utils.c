@@ -1,22 +1,44 @@
 #include "minishell.h"
 
-/*
-char *builtin_str[] = {
-  "cd",
-  "exit"
-};
-*/
 char **builtin_str(void)
 {
     char *cmd;
     char **str;
-    cmd = "cd exit";
+    cmd = "cd exit help";
     str = ft_split(cmd, (char)SPACE_DELM);
     return str;    
 }
 
+int lsh_num_builtins(char **builtin_str) {
+  //return sizeof(builtin_str) / sizeof(char *);
+  return (2);
+}
+
+int	ft_strcmp(char *s1, char *s2)
+{
+	while (*s1 != '\0' && *s2 != '\0')
+	{
+		if (*s1 - *s2 == 0)
+		{
+			s1++;
+			s2++;
+		}
+		else
+		{
+			return (*s1 - *s2);
+		}
+	}
+	return (*s1 - *s2);
+}
+
+int builtin_func(char *cmd, char **args){
+  if (ft_strcmp(cmd, "cd") == 0)
+    return (cmd_cd(args));
+  else if (ft_strcmp(cmd, "exit") == 0)
+    return (cmd_exit(args));
+  return (0);
+}
 int len_num_builtins(char **builtin_str) {
-  //return sizeof(builtin_str()) / sizeof(char *);
   int i;
   i = 0;
   while(builtin_str[i]){
