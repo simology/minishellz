@@ -46,15 +46,15 @@ void shell_loop(void)
   {
     line = read_line();
     args = split_command_line(line);
-    status = cmd_execute(args);
-    printf("val : %d \n", len_num_builtins());
+    status = cmd_prepare(args);
+    //printf("val : %d \n", len_num_builtins());
 
     free(line);
     free(args);
   }
 }
 
-int command_launch(char **args)
+int cmd_execute(char **args)
 {
   pid_t pid;
   pid_t wpid;
@@ -64,13 +64,13 @@ int command_launch(char **args)
   if (pid == 0) {
     // Child process
     if (execvp(args[0], args) == -1) {
-      perror("lsh");
+      perror("lsh child");
     }
     exit(EXIT_FAILURE);
   } 
   else if (pid < 0) {
     // Error forking
-    perror("lsh");
+    perror("lsh fork");
   } 
   else {
     // Parent process
@@ -83,35 +83,39 @@ int command_launch(char **args)
   return 1;
 }
 
-int cmd_execute(char **args)
+int cmd_prepare(char **args)
 {
-  int
+  int i;
+  char **cmd;
   i = 0;
+  cmd = builtin_str();
 
+  /*
   char *builtin_str[] = {
   "cd",
   "exit"
-};
-
+  };
+  */
 
   int (*builtin_func[]) (char **) = {
   &cmd_cd,
   &cmd_exit
-};
+  };
 
   if (args[0] == NULL) {
     // An empty command was entered.
     return 1;
   }
-
-  while(i < len_num_builtins()){
-      if (strcmp(args[0], builtin_str[i]) == 0) {
+  printf("val : %s \n", args[0]);
+  while(i < len_num_builtins(cmd)){
+      if (strcmp(args[0], cmd[i]) == 0) {
+        //printf("builtin cmd %s and invoke %s \n", args[0], cmd[i]);
       return (*builtin_func[i])(args);
     }
     i++;
   }
 
-  return command_launch(args);
+  return cmd_execute(args);
 }
 
 int main(void)

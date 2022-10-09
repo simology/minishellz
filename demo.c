@@ -2,8 +2,14 @@
 
 int main(void)
 {
-    char str[] = "Hell wolrd ciao";
-    char **dd;
-    dd = ft_split(str, ' ');
-    printf("val : %s \n", dd[1]);
+    char **test;
+    test = builtin_str();
+    int i = 0;
+    while(test[i]){
+
+    printf("val : %s \n", test[i]);
+    i++;
+    }
+    printf("val : %d \n", len_num_builtins(test));
+    
 }
