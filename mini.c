@@ -46,6 +46,7 @@ void shell_loop(void)
   {
     line = read_line();
     args = split_command_line(line);
+	
     status = cmd_prepare(args);
     //printf("val : %d \n", len_num_builtins());
 
@@ -54,25 +55,27 @@ void shell_loop(void)
   }
 }
 
-int cmd_execute(char **args)
+int old_cmd_execute(char **args)
 {
   pid_t pid;
-  pid_t wpid;
-  int status;
-
+  //pid_t wpid;
+  //int status;
+  printf("cmd from exe : %s \n", args[0]);
+  printf("cmd from exe 2 : %s \n", args[1]);
   pid = fork();
   if (pid == 0) {
+    printf("Child PID: %d\n", getpid());
     // Child process
     if (execvp(args[0], args) == -1) {
-      perror("lsh child");
+      perror("exec error");
     }
-    exit(EXIT_FAILURE);
-  } 
-  else if (pid < 0) {
+    //exit(EXIT_FAILURE);
+  }
+  else {
     // Error forking
     perror("lsh fork");
-  } 
-  
+  }
+  /*
   else {
     // Parent process
     while(!WIFEXITED(status) && !WIFSIGNALED(status))
@@ -80,17 +83,48 @@ int cmd_execute(char **args)
       wpid = waitpid(pid, &status, WUNTRACED);
     }
   }
-  
+  */
   return 1;
+}
+
+int cmd_execute(char **args){
+
+pid_t pid = fork();
+  if(pid == 0) {
+	printf("Child => PPID: %d PID: %d\n", getppid(), getpid());
+	printf("cmd 1 : %s \n", args[0]);
+	printf("cmd 2 : %s \n", args[1]);
+    if (execvp(args[0], args) == -1) {
+      	printf("error exec.\n");
+    }
+	exit(EXIT_FAILURE);
+    
+  }
+  else if(pid > 0) {
+    printf("Parent => PID: %d\n", getpid());
+    printf("Waiting for child process to finish.\n");
+    wait(NULL);
+    printf("Child process finished.\n");
+  }
+  else {
+    printf("Unable to create child process.\n");
+  }
+ 
+  return 1;
+
 }
 
 int cmd_prepare(char **args)
 {
   int i;
   char **cmd;
-
+	char **lab;
+	lab = builtin_str();
   i = 0;
-  cmd = builtin_str();
+  cmd = lab;
+  ft_argv_print(args);  	
+	
+	printf("add of cmd %p \nadd of cmd %p \n", cmd, args);
 
   /*
   char *cmd[] = {
@@ -104,22 +138,24 @@ int cmd_prepare(char **args)
   &cmd_exit
   };
   */
+ 
   if (args[0] == NULL) {
     // An empty command was entered.
     return 1;
   }
-  //while(i < lsh_num_builtins(cmd)){
+
   while(i < len_num_builtins(cmd)){
+  //while(i < lsh_num_builtins(cmd)){
       if (ft_strcmp(args[0], cmd[i]) == 0) {
         return (builtin_func(cmd[i], args));
         //return (*builtin_func[i])(args);
-      
     }
+    
     i++;
   }
-        printf("count : %d \n", len_num_builtins(cmd));
-        printf("cmd : %s \n", cmd[i]);
+        
 
+printf("count : %d \n", len_num_builtins(cmd));
   return cmd_execute(args);
 }
 

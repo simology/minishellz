@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
 #define SPACE_DELM ' '
 
 char	**ft_split(char const *s, char c);
@@ -22,7 +23,7 @@ int     cmd_prepare(char **args);
 int     cmd_cd(char **args);
 int     cmd_exit(char **args);
 
-
+void ft_argv_print(char **argv);
 int lsh_num_builtins(char **builtin_str);
 int len_num_builtins(char **builtin_str);
 char **builtin_str(void);

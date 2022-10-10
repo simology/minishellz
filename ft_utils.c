@@ -6,12 +6,11 @@ char **builtin_str(void)
     char **str;
     cmd = "cd exit help";
     str = ft_split(cmd, (char)SPACE_DELM);
-    return str;    
+    return (str);    
 }
 
 int lsh_num_builtins(char **builtin_str) {
-  //return sizeof(builtin_str) / sizeof(char *);
-  return (2);
+  return sizeof(builtin_str) / sizeof(char *);
 }
 
 int	ft_strcmp(char *s1, char *s2)
@@ -30,8 +29,16 @@ int	ft_strcmp(char *s1, char *s2)
 	}
 	return (*s1 - *s2);
 }
-
+void ft_argv_print(char **argv)
+{
+  int i = 0;
+  while (argv[i]){
+    printf("argv print %s \n", argv[i]);
+    i++;
+  }
+}
 int builtin_func(char *cmd, char **args){
+  printf("inside : %s \n ", args[0]);
   if (ft_strcmp(cmd, "cd") == 0)
     return (cmd_cd(args));
   else if (ft_strcmp(cmd, "exit") == 0)
@@ -65,5 +72,6 @@ int cmd_cd(char **args)
 
 int cmd_exit(char **args)
 {
+  (void)args;
   return 0;
 }
