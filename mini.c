@@ -1,13 +1,14 @@
 #include "minishell.h"
 
 
-char *read_line(void)
+char *read_line(t_config *config)
 {
   char *line;
-  line = readline( "minishell> " );
+  line = readline(config->banner);
   if (line == NULL)
     return (0);
   else
+    add_history(line);
     return (line);
 }
 
@@ -20,10 +21,8 @@ char **split_command_line(char *line)
   position = 0;
   splited = ft_split(line, (char)SPACE_DELM);
   while (splited[position] != '\0'){
-    //printf("VAL : %s \n", splited[position]);
     position++;
   }
-  //printf("total split %d \n", position);
   tokens = malloc(position * sizeof(char*));
   position = 0;
   while(splited[position] != '\0'){
@@ -44,7 +43,7 @@ void shell_loop(t_config *config)
 
   while(status) 
   {
-    line = read_line();
+    line = read_line(config);
     config->args_cmd = split_command_line(line);
     status = cmd_prepare(config);
     free(line);
@@ -141,7 +140,7 @@ void shell_init(t_config *config){
 	
 	config->builtin_cmd = builtin_str();
 	config->builtin_len = len_num_builtins(config->builtin_cmd);
-
+  config->banner = ft_strcat(getenv("USER"), "@minishell>");
 }
 
 int main(void)

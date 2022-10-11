@@ -17,6 +17,7 @@ typedef struct s_config
     char    **builtin_cmd;
     char    **args_cmd;
     int     builtin_len;
+    char    *banner;
 } t_config;
 
 
@@ -25,7 +26,10 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 int	    ft_strcmp(char *s1, char *s2);
 size_t	ft_strlen(const char *s);
+char	*ft_strcat(char *dest, char *src);
 
+
+char    *read_line(t_config *config);
 
 int     cmd_execute(t_config *config);
 int     cmd_prepare(t_config *config);
