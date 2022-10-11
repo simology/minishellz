@@ -34,10 +34,10 @@ char **split_command_line(char *line)
   return tokens;
 }
 
-void shell_loop(void)
+void shell_loop(t_config *config)
 {
   char *line;
-  char **args;
+  
   int status;
 
   status = 1;
@@ -45,13 +45,10 @@ void shell_loop(void)
   while(status) 
   {
     line = read_line();
-    args = split_command_line(line);
-	
-    status = cmd_prepare(args);
-    //printf("val : %d \n", len_num_builtins());
-
+    config->args_cmd = split_command_line(line);
+    status = cmd_prepare(config);
     free(line);
-    free(args);
+    //free(args);
   }
 }
 
@@ -87,84 +84,70 @@ int old_cmd_execute(char **args)
   return 1;
 }
 
-int cmd_execute(char **args){
+int cmd_execute(t_config *config){
 
-pid_t pid = fork();
-  if(pid == 0) {
-	printf("Child => PPID: %d PID: %d\n", getppid(), getpid());
-	printf("cmd 1 : %s \n", args[0]);
-	printf("cmd 2 : %s \n", args[1]);
-    if (execvp(args[0], args) == -1) {
-      	printf("error exec.\n");
-    }
-	exit(EXIT_FAILURE);
-    
-  }
-  else if(pid > 0) {
-    printf("Parent => PID: %d\n", getpid());
-    printf("Waiting for child process to finish.\n");
-    wait(NULL);
-    printf("Child process finished.\n");
-  }
-  else {
-    printf("Unable to create child process.\n");
-  }
- 
-  return 1;
+	pid_t pid;
+
+	pid = fork();
+
+	if(pid == 0) {
+		/*
+		printf("cmd 1 : %s \n", config->args_cmd[0]);
+		printf("args 2 : %s \n", config->args_cmd[1]);
+		*/
+		if (execvp(config->args_cmd[0], config->args_cmd) == -1) {
+			printf("error exec.\n");
+	}
+		exit(EXIT_FAILURE);
+
+	}
+	else if(pid > 0) {
+		/*
+		printf("Parent => PID: %d\n", getpid());
+		printf("Waiting for child process to finish.\n");
+		*/
+		wait(NULL);
+		/*
+		printf("Child process finished.\n");
+		*/
+	}
+	else {
+		
+	}
+	return 1;
 
 }
 
-int cmd_prepare(char **args)
+int cmd_prepare(t_config *config)
 {
-  int i;
-  char **cmd;
-  i = 0;
-	cmd = builtin_str();
-  ft_argv_print(args);  	
+	int i;
+	i = 0;
+	//ft_argv_print(config->args_cmd);  	
 	
-	printf("add of cmd %p \nadd of cmd %p \n", cmd, args);
-
-  /*
-  char *cmd[] = {
-  "cd",
-  "exit",
-  "help"
-  };
-
-  int (*builtin_func[]) (char **) = {
-  &cmd_cd,
-  &cmd_exit
-  };
-  */
- 
-  if (args[0] == NULL) {
-    // An empty command was entered.
+  if (config->args_cmd[0] == NULL) {
     return 1;
   }
 
-  while(i < len_num_builtins(cmd)){
-  //while(i < lsh_num_builtins(cmd)){
-      if (ft_strcmp(args[0], cmd[i]) == 0) {
-        return (builtin_func(cmd[i], args));
-        //return (*builtin_func[i])(args);
+  while(i < config->builtin_len){
+      if (ft_strcmp(config->args_cmd[0], config->builtin_cmd[i]) == 0) {
+        return (builtin_func(config->builtin_cmd[i], config->args_cmd));
     }
-    
-    i++;
+	i++;
   }
-        
+	return cmd_execute(config);
+}
 
-printf("count : %d \n", len_num_builtins(cmd));
-  return cmd_execute(args);
+void shell_init(t_config *config){
+	
+	config->builtin_cmd = builtin_str();
+	config->builtin_len = len_num_builtins(config->builtin_cmd);
+
 }
 
 int main(void)
 {
-  // Load config files, if any.
-
-  // Run command loop.
-  shell_loop();
-
-  // Perform any shutdown/cleanup.
-
-  return (1);
+	t_config config;
+	shell_init(&config);
+	shell_loop(&config);
+  	return (1);
 }
