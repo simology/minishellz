@@ -118,10 +118,8 @@ int cmd_prepare(char **args)
 {
   int i;
   char **cmd;
-	char **lab;
-	lab = builtin_str();
   i = 0;
-  cmd = lab;
+	cmd = builtin_str();
   ft_argv_print(args);  	
 	
 	printf("add of cmd %p \nadd of cmd %p \n", cmd, args);
