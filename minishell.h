@@ -11,13 +11,20 @@
 #include <string.h>
 #include <sys/types.h>
 #define SPACE_DELM ' '
+#define PIPE_DELM '|'
 
 typedef struct s_config
 {
     char    **builtin_cmd;
     char    **args_cmd;
-    int     builtin_len;
     char    *banner;
+    char    *line;
+    char    **envp;
+    int     builtin_len;
+    int     n_pipe;
+    char    **pipe_cmd;
+    int		stdout_clone;
+    int		stdin_clone;
 } t_config;
 
 
@@ -27,9 +34,18 @@ char	*ft_substr(char const *s, unsigned int start, size_t len);
 int	    ft_strcmp(char *s1, char *s2);
 size_t	ft_strlen(const char *s);
 char	*ft_strcat(char *dest, char *src);
+char	*ft_strjoin(char const *s1, char const *s2);
+int	    ft_strncmp(const char *s1, const char *s2, size_t n);
 
-
+char	*ft_pathfinder(char *cmd, char **envp);
+int	free_matrix(char **matrix);
 char    *read_line(t_config *config);
+
+int pipe_detector(t_config *config);
+
+int     operator_detector(t_config *config);
+int     pipe_detector(t_config *config);
+void pipe_execute(t_config *config, char **envp);
 
 int     cmd_execute(t_config *config);
 int     cmd_prepare(t_config *config);
@@ -44,6 +60,6 @@ char **builtin_str(void);
 int  builtin_func(char *cmd, char **args);
 
 
-void shell_init(t_config *config);
+void shell_init(t_config *config, char **envp);
 void shell_loop(t_config *config);
 #endif
