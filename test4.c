@@ -54,7 +54,7 @@ int main(void)
     char *test;
     char **tok;
     char *x;
-    test = "ls | id";
+    test = "ls - l | wc -e";
     tok = split_pipe_cmd(test);
     x = demo(tok);
     printf("d : %s \n", x);

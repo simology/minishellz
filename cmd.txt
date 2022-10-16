@@ -4,3 +4,18 @@ echo hello mondo 123
 echo "hello" word
 echo hello                  word
 echo "hello
+
+
+
+create parser
+save command in array and argument another array 
+get back args by command
+
+
+ls
+ls -l
+ls -l | wc -l
+ls -l | grep -s test | wc -l
+echo aaa > file.txt
+echo "hello"
+echo hello

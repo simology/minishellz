@@ -1,14 +1,18 @@
 #include "minishell.h"
 
 int xpipe_execute(t_config *config, char **envp){
-    char *args[3];
-    args[0] = "/bin/ls";
-    args[1] = "-l";
-    args[2] = NULL;
+    char *args[2];
+    char *cmd[2];
+    //args[0] = "/bin/ls";
+    cmd[0] = "/bin/ls";
+    args[0] = "-l";
+    args[1] = NULL;
 
     char *argss[3];
-    argss[0] = "/usr/bin/wc";
-    argss[1] = "-l";
+    //argss[0] = "/usr/bin/wc";
+    cmd[1] = "/usr/bin/grep";
+    argss[0] = "-i";
+    argss[1] = "test";
     argss[2] = NULL;
     int     ch[2];
     pid_t   child1;
@@ -21,8 +25,8 @@ int xpipe_execute(t_config *config, char **envp){
         close(ch[0]);
         config->stdout_clone = dup(STDOUT_FILENO);
         dup2(ch[1], STDOUT_FILENO);
-        if (execve(args[0], args, envp))
-			    //printf("error exec pipe 1.\n");
+        if (execve(cmd[0], args, envp))
+			    printf("error exec pipe 1.\n");
           dup2(config->stdout_clone, STDOUT_FILENO);
           close(config->stdout_clone);
           close(ch[1]);
@@ -36,8 +40,8 @@ int xpipe_execute(t_config *config, char **envp){
         config->stdin_clone = dup(STDIN_FILENO);
         dup2(ch[0], STDIN_FILENO);
         //printf("val : %s \n", argss[0]);
-        if (execve(argss[0], argss, envp))
-            //printf("error exec pipe 2.\n");
+        if (execve(cmd[1], argss, envp))
+            printf("error exec pipe 2.\n");
         dup2(config->stdin_clone, STDIN_FILENO);
         close(config->stdin_clone);
         close(ch[0]);
@@ -57,5 +61,13 @@ int main(int argc, char **argv, char **envp){
     t_config config;
     (void)argc;
     (void)argv;
+      char cwd[256];
+
+
+    if (getcwd(cwd, sizeof(cwd)) == NULL)
+      perror("getcwd() error");
+    else
+      printf("current working directory is: %s\n", cwd);
+
     xpipe_execute(&config, envp);
 }

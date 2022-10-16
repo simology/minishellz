@@ -23,7 +23,7 @@ char **split_command_line(char *line)
   while (splited[position] != '\0'){
     position++;
   }
-  tokens = malloc(position * sizeof(char*));
+  tokens = malloc(position * sizeof(char*) + 1);
   position = 0;
   while(splited[position] != '\0'){
     tokens[position] = splited[position];
@@ -44,7 +44,7 @@ char **split_pipe_cmd(char *line)
   while (splited[position] != '\0'){
     position++;
   }
-  tokens = malloc(position * sizeof(char*));
+  tokens = malloc(position * sizeof(char*) + 1);
   position = 0;
   while(splited[position] != '\0'){
     tokens[position] = splited[position];
@@ -69,13 +69,17 @@ void shell_loop(t_config *config)
 		config->args_cmd = split_command_line(config->tmp);
 		printf("arg0 : %s \n", config->args_cmd[0]);
 		printf("arg1 : %s \n", config->args_cmd[1]);
+		printf("arg2 : %s \n", config->args_cmd[2]);
+		printf("arg3 : %s \n", config->args_cmd[3]);
    		status = pipe_execute(config);
 	}
 	else
 	{
     config->args_cmd = split_command_line(config->line);
 	printf("arg0 : %s \n", config->args_cmd[0]);
+	printf("arg1 : %s \n", config->args_cmd[1]);
 	printf("arg2 : %s \n", config->args_cmd[2]);
+	printf("arg3 : %s \n", config->args_cmd[3]);
     status = cmd_prepare(config);
 	}
     
