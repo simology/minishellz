@@ -33,7 +33,7 @@ void ft_argv_print(char **argv)
 {
   int i = 0;
   while (argv[i]){
-    printf("argv print %s \n", argv[i]);
+    printf("argv print id %d : %s \n", i, argv[i]);
     i++;
   }
 }
@@ -88,12 +88,12 @@ int	free_matrix(char **matrix)
 }
 
 char *split_to_line(char **str){
-	int i;
+	  int i;
     int count;
     char *line;
     i = 0;
     count = 0;
-    while (str[i]){
+    while (str[i] != '\0'){
         count += ft_strlen(str[i]);
         i++;
     }

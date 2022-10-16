@@ -18,10 +18,11 @@
 
 typedef struct s_config
 {
-    char **args;
-    char **cmd;
-    int i;
-    
+    char    **args;
+    char    **cmd;
+    int     i;
+    char    *line;
+    char    **tmp1;
 } t_config;
 
 
@@ -37,4 +38,8 @@ int	    ft_strncmp(const char *s1, const char *s2, size_t n);
 char	*ft_pathfinder(char *cmd, char **envp);
 int	    free_matrix(char **matrix);
 
+
+
+void ft_argv_print(char **argv);
+char *split_to_line(char **str);
 #endif

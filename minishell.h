@@ -48,9 +48,8 @@ char    *read_line(t_config *config);
 char    *split_to_line(char **str);
 int     pipe_detector(t_config *config);
 
-int     operator_detector(t_config *config, char *str);
 int     pipe_detector(t_config *config);
-int    pipe_execute(t_config *config);
+int     pipe_execute(t_config *config);
 
 int     cmd_execute(t_config *config);
 int     cmd_prepare(t_config *config);
