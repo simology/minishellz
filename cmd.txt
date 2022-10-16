@@ -1,1 +1,6 @@
 gcc -Wall -Werror -Wextra -lreadline mini.c ft*
+
+echo hello mondo 123
+echo "hello" word
+echo hello                  word
+echo "hello

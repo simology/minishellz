@@ -12,6 +12,9 @@
 #include <sys/types.h>
 #define SPACE_DELM ' '
 #define PIPE_DELM '|'
+#define DOUBLE_RIGHT_REDIRECTION '>>'
+#define DOUBLE_LEFT_REDIRECTION '<<'
+
 
 typedef struct s_config
 {
@@ -25,6 +28,7 @@ typedef struct s_config
     char    **pipe_cmd;
     int		stdout_clone;
     int		stdin_clone;
+    char    *tmp;
 } t_config;
 
 
@@ -38,14 +42,15 @@ char	*ft_strjoin(char const *s1, char const *s2);
 int	    ft_strncmp(const char *s1, const char *s2, size_t n);
 
 char	*ft_pathfinder(char *cmd, char **envp);
-int	free_matrix(char **matrix);
+int	    free_matrix(char **matrix);
 char    *read_line(t_config *config);
 
-int pipe_detector(t_config *config);
-
-int     operator_detector(t_config *config);
+char    *split_to_line(char **str);
 int     pipe_detector(t_config *config);
-void pipe_execute(t_config *config, char **envp);
+
+int     operator_detector(t_config *config, char *str);
+int     pipe_detector(t_config *config);
+int    pipe_execute(t_config *config);
 
 int     cmd_execute(t_config *config);
 int     cmd_prepare(t_config *config);

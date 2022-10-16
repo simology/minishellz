@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-void pipe_execute(t_config *config, char **envp){
+int xpipe_execute(t_config *config, char **envp){
     char *args[3];
     args[0] = "/bin/ls";
     args[1] = "-l";
@@ -50,11 +50,12 @@ void pipe_execute(t_config *config, char **envp){
     wait(NULL);
     wait(NULL);
     // sleep(10);
+    return (1);
 }
 
 int main(int argc, char **argv, char **envp){
     t_config config;
     (void)argc;
     (void)argv;
-    pipe_execute(&config, envp);
+    xpipe_execute(&config, envp);
 }

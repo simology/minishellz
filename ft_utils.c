@@ -87,6 +87,26 @@ int	free_matrix(char **matrix)
 	return (0);
 }
 
+char *split_to_line(char **str){
+	int i;
+    int count;
+    char *line;
+    i = 0;
+    count = 0;
+    while (str[i]){
+        count += ft_strlen(str[i]);
+        i++;
+    }
+    line = malloc( sizeof(char) * count + 1 );
+    i = 0;
+    while(str[i]){
+        ft_strcat(line, str[i]);
+        i++;
+    }
+    line[count] = '\0';
+    return(line); 
+}
+
 int len_num_builtins(char **builtin_str) {
   int i;
   i = 0;

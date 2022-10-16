@@ -1,54 +1,75 @@
 #include "minishell.h"
-void demo(char **envp){
-
-char *args[2];
-args[0] = "/bin/ls";
-args[1] = "-l";
-
-char *argss[2];
-argss[0] = "/usr/bin/wc";
-argss[1] = "-l";
-pid_t pid;
-int fd[2];
-
-pipe(fd);
-pid = fork();
-
-if(pid==0)
+char **split_pipe_cmd(char *line)
 {
-    dup2(fd[1], STDOUT_FILENO);
+  int position;
+  char **tokens;
+  char **splited;
 
-    if (execve(args[0], args, envp))
-      printf("error exec pipe 1.\n");
-    exit(1);
+  position = 0;
+  splited = ft_split(line, (char)PIPE_DELM);
+  while (splited[position] != '\0'){
+    position++;
+  }
+  tokens = malloc(position * sizeof(char*));
+  position = 0;
+  while(splited[position] != '\0'){
+    tokens[position] = splited[position];
+    position++;
+  }
+  tokens[position] = 0;
+  return tokens;
 }
-else
-{ 
-    pid=fork();
-
-    if(pid==0)
-    {
-        dup2(fd[0], STDIN_FILENO);
-
-        if (execve(argss[0], argss, envp))
-            printf("error exec pipe 2.\n");
-        exit(1);
-    }
-    else
-    {
-        int status;
-        close(fd[0]);
-        close(fd[1]);
-        waitpid(pid, &status, 0);
-    }
-}
-
-}
-
-
-int main(int argc, char **argv, char **envp)
+char **split_command_line(char *line)
 {
-(void)argc;
-(void)argv;
-  demo(envp);
+  int position;
+  char **tokens;
+  char **splited;
+
+  position = 0;
+  splited = ft_split(line, (char)SPACE_DELM);
+  while (splited[position] != '\0'){
+    position++;
+  }
+  tokens = malloc(position * sizeof(char*));
+  position = 0;
+  while(splited[position] != '\0'){
+    tokens[position] = splited[position];
+    position++;
+  }
+  tokens[position] = 0;
+  return tokens;
+}
+char *demo(char **str){
+	int i;
+    int count;
+    char *line;
+    i = 0;
+    count = 0;
+    while (str[i]){
+        count += ft_strlen(str[i]);
+        i++;
+    }
+    line = malloc( sizeof(char) * count + 1 );
+    i = 0;
+    while(str[i]){
+        ft_strcat(line, str[i]);
+        i++;
+    }
+    line[count] = '\0';
+    return(line); 
+}
+
+
+int main(void)
+{
+char *line = "ls -l | wc -l";
+char **tok;
+tok = ft_split(line, (char)PIPE_DELM);
+char *xx;
+xx = demo(tok);
+printf("val : %s \n", xx);
+/*
+//ft_argv_print();
+*/
+return (0);
 }

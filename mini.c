@@ -56,16 +56,29 @@ char **split_pipe_cmd(char *line)
 void shell_loop(t_config *config)
 {  
   int status;
-
   status = 1;
 
   while(status) 
   {
     config->line = read_line(config);
+	pipe_detector(config);
+    if(config->n_pipe){
+		config->pipe_cmd = ft_split(config->line, (char)PIPE_DELM);
+		config->tmp = split_to_line(config->pipe_cmd);
+		printf("line : %s \n", config->tmp);
+		config->args_cmd = split_command_line(config->tmp);
+		printf("arg0 : %s \n", config->args_cmd[0]);
+		printf("arg1 : %s \n", config->args_cmd[1]);
+   		status = pipe_execute(config);
+	}
+	else
+	{
     config->args_cmd = split_command_line(config->line);
+	printf("arg0 : %s \n", config->args_cmd[0]);
+	printf("arg2 : %s \n", config->args_cmd[2]);
+    status = cmd_prepare(config);
+	}
     
-    status = pipe_execute(config);
-    //status = cmd_prepare(config);
 
     //operator_detector(config);
     //config->pipe_cmd = split_pipe_cmd(config->line);
@@ -75,6 +88,7 @@ void shell_loop(t_config *config)
     //free(args);
   }
 }
+
 
 
 int cmd_execute(t_config *config){
@@ -89,7 +103,7 @@ int cmd_execute(t_config *config){
 		printf("args 2 : %s \n", config->args_cmd[1]);
 		*/
 		//if (execvp(config->args_cmd[0], config->args_cmd) == -1) {
-      if(execve(ft_pathfinder("", config->envp), config->args_cmd, config->envp)){
+      if(execve(ft_pathfinder(config->args_cmd[0], config->envp), config->args_cmd, config->envp)){
 			printf("error exec.\n");
 	}
 		exit(EXIT_FAILURE);
@@ -131,74 +145,85 @@ int cmd_prepare(t_config *config)
 }
 
 int pipe_detector(t_config *config){
-
-return (config->n_pipe);
+	int i;
+	
+	i = 0;
+	while(config->line[i]){
+		if(config->line[i] == PIPE_DELM ){
+			config->n_pipe++;
+		}
+		i++;
+	}
+	return(config->n_pipe);
 }
 
-int operator_detector(t_config *config){
-  /*
-  if(config->n_pipe)
-    return(pipe_execute(config));
-  */
-  return (config->n_pipe);
+int operator_detector(t_config *config, char *str){
+(void)config;
+(void)str;
+return (0);
 }
 
 int pipe_execute(t_config *config){
-    char *args[2];
-    args[0] = "/bin/ls";
-    args[1] = "-l";
 
-    char *argss[2];
-    argss[0] = "/usr/bin/wc";
-    argss[1] = "-l";
     int     ch[2];
     pid_t   child1;
     pid_t   child2;
     pipe(ch);
     child1 = fork();
-    if (0 == child1) {
-        //* Child   1
-        printf("val : %s", args[0]);
-        config->stdout_clone = dup(STDOUT_FILENO);
-        dup2(STDOUT_FILENO, ch[1]);
-        if (execve(args[0], args, config->envp))
-			    printf("error exec pipe 1.\n");
-          dup2(STDOUT_FILENO, config->stdout_clone);
-          close(config->stdout_clone);
-    }
-    else
+	/*
+	while(i < config->n_pipe)
+	{
+	*/
+
+    if (child1 == 0)
     {
-        //* Parent
-        child2 = fork();
-        if (0 == child2) {
-            //* Child   2
-        config->stdin_clone = dup(STDIN_FILENO);
-        dup2(STDIN_FILENO, ch[0]);
-        printf("val : %s", argss[0]);
-        if (execve(argss[0], argss, config->envp))
-            printf("error exec pipe 2.\n");
-        dup2(STDIN_FILENO, config->stdin_clone);
-        close(ch[1]);
-        }
-        else
-        {
-            //* Parent
-            close(ch[0]);
-            close(ch[1]);
-            waitpid(child1, NULL, 0);
-            waitpid(child2, NULL, 0);
-            return (1);
-        }
+        //* Child   1
+        close(ch[0]);
+        config->stdout_clone = dup(STDOUT_FILENO);
+		printf("cmd pipe : %s \n", config->args_cmd[0]);
+		printf("val : %s \n", ft_pathfinder(config->args_cmd[0], config->envp));
+        dup2(ch[1], STDOUT_FILENO);
+		if(execve(ft_pathfinder(config->args_cmd[0], config->envp), config->args_cmd, config->envp))
+			printf("error exec pipe 1.\n");
+		dup2(config->stdout_clone, STDOUT_FILENO);
+		close(config->stdout_clone);
+		close(ch[1]);
+		exit(0);
     }
-  return (0);
+
+    child2 = fork();
+    if (child2 == 0){
+        //* Child   2
+        close(ch[1]);
+        config->stdin_clone = dup(STDIN_FILENO);
+        dup2(ch[0], STDIN_FILENO);
+		printf("cmd pipe2 : %s \n", config->args_cmd[2]);
+		printf("val : %s \n", ft_pathfinder(config->args_cmd[2], config->envp));
+        if(execve(ft_pathfinder(config->args_cmd[2], config->envp), config->args_cmd, config->envp))
+            printf("error exec pipe 2.\n");
+        dup2(config->stdin_clone, STDIN_FILENO);
+        close(config->stdin_clone);
+        close(ch[0]);
+        exit(0);
+    }
+
+    close(ch[0]);
+    close(ch[1]);
+    wait(NULL);
+    wait(NULL);
+/*
+}
+*/
+return (1);
 }
 
 void shell_init(t_config *config, char **envp){
 	config->envp = envp;
 	config->builtin_cmd = builtin_str();
 	config->builtin_len = len_num_builtins(config->builtin_cmd);
-  config->banner = ft_strcat(getenv("USER"), "@minishell>");
-  config->n_pipe = 0;
+  	config->banner = ft_strcat(getenv("USER"), "@minishell>");
+  	config->n_pipe = 0;
+	
 }
 
 int main(int argc, char **argv,char **envp)
@@ -208,5 +233,5 @@ int main(int argc, char **argv,char **envp)
 	t_config config;
 	shell_init(&config, envp);
 	shell_loop(&config);
-  	return (1);
+  return (1);
 }
